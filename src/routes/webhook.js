@@ -27,6 +27,7 @@ router.get('/', (req, res) => {
 // Incoming Message (POST to /webhook)
 router.post('/', async (req, res) => {
   try {
+    logger.info('Incoming Webhook Body: ' + JSON.stringify(req.body));
     const data = whatsappService.parseIncomingWebhook(req.body);
     
     // Always return 200 immediately to Meta
