@@ -13,6 +13,10 @@ app.use(cors());
 // Webhook routes need raw body for verification, but json is fine for Meta
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('🚗 Honda WhatsApp Booking Bot is Live! Use /webhook for the WhatsApp API.');
+});
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -23,6 +27,8 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/webhook', webhookRoutes);
+// Provide a fallback for the path the user is trying to use in 11za
+app.use('/api/webhook/whatsapp', webhookRoutes);
 app.use('/admin', adminRoutes);
 
 app.use(errorHandler);
