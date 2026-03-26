@@ -11,6 +11,8 @@ const CONVERSATION_STATES = {
 
 const HONDA_MODELS = ['Honda City', 'Honda Amaze', 'Honda Elevate'];
 
+const SUPPORTED_CITIES = ['Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Surat', 'Ahmedabad'];
+
 const TIME_SLOTS = [
   { id: '10:00', display: '10:00 AM - 11:00 AM' },
   { id: '11:00', display: '11:00 AM - 12:00 PM' },

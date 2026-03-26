@@ -14,8 +14,8 @@ const MAX_HISTORY_TURNS = 10;
  */
 function buildSystemPrompt(sessionData) {
   const { HONDA_MODELS, SUPPORTED_CITIES } = require('../config/constants');
-  const models = HONDA_MODELS.map((m) => m.name).join(', ');
-  const cities = SUPPORTED_CITIES.join(', ');
+  const models = HONDA_MODELS.join(', ');
+  const cities = (SUPPORTED_CITIES || []).join(', ');
 
   return `You are "Honda Assistant" — a friendly, professional AI chatbot for Honda India helping customers book test drives.
 
