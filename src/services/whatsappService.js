@@ -141,28 +141,39 @@ async function markMessageRead(messageId) {
  */
 function parseIncomingWebhook(body) {
   try {
-    const entry = body?.entry?.[0];
-    const change = entry?.changes?.[0];
-    const value = change?.value;
+    // 1. Standard Meta Cloud API Format
+    if (body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) {
+      const value = body.entry[0].changes[0].value;
+      const msg = value.messages[0];
+      const contact = value.contacts?.[0];
 
-    if (!value?.messages?.length) return null;
+      return {
+        messageId: msg.id,
+        from: msg.from,
+        senderName: contact?.profile?.name || 'Customer',
+        timestamp: msg.timestamp,
+        type: msg.type,
+        text: msg.text?.body || null,
+        interactiveId: msg.interactive?.button_reply?.id || msg.interactive?.list_reply?.id || null,
+        interactiveTitle: msg.interactive?.button_reply?.title || msg.interactive?.list_reply?.title || null,
+      };
+    }
 
-    const msg = value.messages[0];
-    const contact = value.contacts?.[0];
+    // 2. Simple format (Common for some BSPs/11za)
+    if (body?.from && (body?.text || body?.body)) {
+      return {
+        messageId: body.id || `msg_${Date.now()}`,
+        from: body.from,
+        senderName: body.senderName || body.name || 'Customer',
+        timestamp: body.timestamp || Math.floor(Date.now() / 1000),
+        type: body.type || 'text',
+        text: body.text || body.body || null,
+        interactiveId: body.interactiveId || null,
+        interactiveTitle: body.interactiveTitle || null,
+      };
+    }
 
-    return {
-      messageId: msg.id,
-      from: msg.from,              // Phone number (E.164 format)
-      senderName: contact?.profile?.name || 'Customer',
-      timestamp: msg.timestamp,
-      type: msg.type,              // text, interactive, etc.
-      text: msg.text?.body || null,
-      // For interactive replies (button/list)
-      interactiveId: msg.interactive?.button_reply?.id ||
-                     msg.interactive?.list_reply?.id || null,
-      interactiveTitle: msg.interactive?.button_reply?.title ||
-                        msg.interactive?.list_reply?.title || null,
-    };
+    return null;
   } catch (e) {
     logger.error('Failed to parse webhook body:', e);
     return null;
