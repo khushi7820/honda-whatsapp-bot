@@ -159,7 +159,21 @@ function parseIncomingWebhook(body) {
       };
     }
 
-    // 2. Simple format (Common for some BSPs/11za)
+    // 2. 11za Format (Specific detection)
+    if (body?.content?.text && body?.from) {
+      return {
+        messageId: body.messageId || `msg_${Date.now()}`,
+        from: body.from,
+        senderName: body.whatsapp?.senderName || 'Customer',
+        timestamp: body.timestamp || Math.floor(Date.now() / 1000),
+        type: 'text',
+        text: body.content.text,
+        interactiveId: body.content.interactiveId || null,
+        interactiveTitle: body.content.interactiveTitle || null,
+      };
+    }
+
+    // 3. Simple fallback format
     if (body?.from && (body?.text || body?.body)) {
       return {
         messageId: body.id || `msg_${Date.now()}`,
